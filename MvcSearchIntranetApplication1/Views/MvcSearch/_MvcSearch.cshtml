@@ -1,0 +1,102 @@
+﻿@*  8.24.17 ok
+        Depends:
+            jquery 1.8.3+
+            <script src="/Scripts/jquery-ui-1.9.2/jquery-ui.js"></script>
+            <script src="/Scripts/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.js"></script>
+            <script src="/Scripts/jquery-ui-1.9.2/jquery-ui-autocomplete.@(CultureHelper.GetCurrentNeutralCulture()).js"></script>
+            <link href="~/Scripts/jquery-ui-1.9.2.custom/css/base/jquery-ui-1.9.2.custom.css" rel="stylesheet" />
+
+        Notes:
+            layout must implement: @RenderSection("styles", required: false)
+
+*@
+@using Searcharoo.Net
+@{
+    bool autocomplete = false;
+    bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["mvcSearch_enableAutocomplete"], out autocomplete);
+    string cc = @CultureHelper.GetCurrentCulture();
+    bool thumbnails = false;
+    bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["mvcSearch_showThumbnail"], out thumbnails);
+    string deflang = System.Configuration.ConfigurationManager.AppSettings["mvcSearch_DefaultLanguage"] + "";
+}
+<link href="/Content/mvcsearch.css" rel="stylesheet" />
+
+<div class="searcharoo-mini">
+    @using (Html.BeginForm("Search", "MvcSearch", FormMethod.Post, new { id = "frmSearcharooMini" }))
+    {
+        <table>
+            <tr class="intro">
+                <td>
+                    @Html.TextBox("searchfor", "", new { placeholder = Searcharoo13Mvc.Resources.Resources.SearcharooSearch_words_to_search_for })
+                    @Html.ValidationMessage("searchfor")
+                    <input type="submit" value="@Searcharoo13Mvc.Resources.Resources.Searcharoo_go" class="button" />
+                </td>
+            </tr>
+        </table>
+    }
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input#searchfor').focus();
+        $('input#searchfor').focus(function () {
+            this.select();
+        });
+        @if (autocomplete) {
+            <text>
+            $('input#searchfor').autocomplete({
+                source: function (request, response) {
+                    $.getJSON('@Url.Action("AutocompleteSearch", "MvcSearch" )', {
+                        text: request.term
+                    }, response);
+                },
+                minLength: 3,
+                //delay: 500,
+                select: function (event, ui) {
+                    window.location.href = ui.item.value;
+                }
+            })
+                .data("autocomplete")._renderItem = function (ul, item) {
+                    return $("<li></li>").data("item.autocomplete", item)
+                @if(thumbnails){
+                    <text>
+                    .append("<img src='" + item.Img + "' alt='" + (item.Img || '') + "' />" +
+                        "<span class='ac-url'><a href='" + formatCshtmlUrl(item.Url) + "'>" + item.Url + "</a></span><br />" +
+                        "<span class='ac-desc'>" + item.Description + "</span><br />" +
+                        "<span class='ac-dt'>" + formatJsonDate(item.CrawledDate, '@(cc)') + "</span>")
+                    </text>
+                }else{
+                    <text>
+                    .append("<span class='ac-url'><a href='" + item.Url + "'>" + item.Url + "</a></span><br />" +
+                        "<span class='ac-desc'>" + item.Description + "</span><br />" +
+                        "<span class='ac-dt'>" + formatJsonDate(item.CrawledDate, '@(cc)') + "</span>")
+                    </text>
+                }
+                    .appendTo(ul);
+        };
+        </text>
+            }
+    });
+        function formatJsonDate(value, culture) {
+            var pattern = /Date\(([^)]+)\)/;
+            var results = pattern.exec(value);
+            var dt = new Date(parseFloat(results[1]));
+            culture = culture + "";
+            if (culture.substring(0, 2) == "en" || culture == "")
+                return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+            if (culture.substring(0, 2) == "es")
+                return dt.getDate() + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear();
+            if (culture.substring(0, 2) == "zh")
+                return dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+        }
+        function formatCshtmlUrl(url) {
+            if (url.indexOf(".cshtml")<0)
+                return url;
+            url = url.replace("/Views", "");
+            url = url.replace("/views", "");
+            if ('@deflang'.indexOf('@cc')!=0) {
+                @*url = url.replace("." + cc + ".", ".");*@
+                url = url.replace(".@cc.", ".");
+            }
+            return url.replace(".cshtml", "");
+        }
+</script>

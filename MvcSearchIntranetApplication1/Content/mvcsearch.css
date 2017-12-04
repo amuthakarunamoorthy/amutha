@@ -1,0 +1,98 @@
+﻿/* 8.24.17 unt
+*/
+body {
+}
+#frmSearcharoo input{
+    width: 300px;
+}
+#frmSearcharoo input[type="text"]{
+    padding:1px 1px 1px 8px;
+}
+#frmSearcharoo table{
+    border: 1px solid #bcbcbc;
+    border-radius:5px;
+    border-collapse:separate;
+    padding:5px 10px;
+}
+#frmSearcharoo table td{
+    text-align: left;
+    padding:5px;
+}
+#frmSearcharoo table tr.intro td{
+    padding: 5px 5px 0 5px;
+}
+#frmSearcharoo p.intro{
+    margin-bottom:0;
+}
+#frmSearcharoo p.copyright{
+    margin: 0 10px 10px 10px;
+    color:#cccccc;
+}
+#frmSearcharoo{
+    min-height:290px;
+}
+#frmSearcharooMini table{
+    height: 50px;
+}
+#frmSearcharooMini input.button {
+    padding: 2px 7px;
+}
+#frmSearcharooMini input[type="text"]{
+    max-width:160px;
+}
+div.searcharoo-mini{
+    max-width:230px;
+    overflow:hidden;
+    /*8.24.17*/
+    float:right;
+	white-space: no-wrap;
+}
+/*8.24.17*/
+div.searcharoo-mini td{
+	padding: 0;
+}
+div.searcharoo-mini td input{
+	margin: 0;
+	padding: 2px 5px;
+}
+
+#frmSearcharoo input[type="checkbox"] {
+    width:auto;
+}
+#frmSearcharoo table td.all-words{
+    text-align: left;
+}
+div#SearchResults div#itemtemplate img{
+    float:left;
+    margin: 5px 10px 5px 0;
+}
+ul.ui-menu{
+    list-style-type: none;
+    padding: 5px 2px 2px 10px;
+    max-width: 620px;
+}
+li.ui-menu-item{
+    margin: 0 5px 10px 0;
+    max-width: 600px;
+}
+li span.ac-url{
+    font-weight: bold;
+}
+li span.ac-desc{
+    color: green;
+}
+li span.ac-dt{
+    color: gray;
+    font-size:.9em;
+    font-style:italic;
+}
+li.ui-menu-item img{
+    float: left;
+    margin: 3px 5px 3px 0;
+}
+
+@media (max-width: 768px) {
+    .searcharooPager td{
+        padding: 5px 10px;
+    }
+}

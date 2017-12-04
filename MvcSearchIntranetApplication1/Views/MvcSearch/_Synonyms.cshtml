@@ -1,0 +1,34 @@
+﻿@*  8.1.17 ok
+   Note: For Mvc3 uncomment Mvc3 labels in <th>s below.
+*@
+@model IEnumerable<Searcharoo.Net.Synonym>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.Text)*@
+            Synonym@* Mvc3*@
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.SynonymFor)*@
+            For Word@* Mvc3*@
+        </th>
+    </tr>
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink("Delete", "AddEditSynonym", new { dbaction = "delete", word = item.Text })
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Text)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SynonymFor)
+                </td>
+            </tr>
+        }
+    }
+</table>

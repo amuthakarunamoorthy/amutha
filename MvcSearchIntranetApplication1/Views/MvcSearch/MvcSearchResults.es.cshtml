@@ -1,0 +1,73 @@
+﻿@*  8.24.17 unt
+
+    ViewBag:
+         SearchTerm (string)
+         DisplayTime (string)
+         NumberOfMatches (int)
+         PagerLinks (string) - html pager links (<a>s)
+    Notes:
+             layout must implement: @RenderSection("styles", required: false)
+*@
+@model IEnumerable<Searcharoo.Net.ResultFile>
+@using Searcharoo.Net
+@{
+    string s;
+    ViewBag.Title = "Resultados de la Búsqueda";
+    string[] terms = null;
+    if (!string.IsNullOrEmpty((string)ViewBag.SearchTerm))
+    {
+        terms = ((string)ViewBag.SearchTerm).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+    }
+    bool thumbnails = false;
+    bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["mvcSearch_showThumbnail"], out thumbnails);
+    string[] webpage_types = (System.Configuration.ConfigurationManager.AppSettings["mvcSearch_webpageTypes"] + "").ToLower().Split(';');
+}
+@section Styles {
+    <link href="/Content/mvcsearch.css" rel="stylesheet" />
+}
+<div id="ucSearchPanelHeader" issearchresultspage="false"></div>
+<div id="lblNoSearchResults" style="display:none;">
+    Su búsqueda - <b>@ViewBag.SearchTerm</b> - no ha coincidido con ningún documento.
+    <br><br>
+    Tomó @ViewBag.DisplayTime.
+    <p>Sugerencias:</p>
+    <ul>
+        <li>Comprueba la ortografía </li>
+        <li>Intente palabras con significado similar (sinónimos) </li>
+        <li>Pruebe menos palabras clave: @ViewBag.Matches</li>
+    </ul>
+</div>
+<div id="SearchResults">
+    <div id="headertemplate">
+        <p>@Html.Raw(string.Format("{0} resultados para <b>{1}</b> tardó {2}", @ViewBag.NumberOfMatches, @ViewBag.SearchTerm, @ViewBag.DisplayTime))</p>
+    </div>
+    @foreach (var item in Model)
+    {
+        s = Searcharoo.Net.SearcharooSearch.formatCshtmlUrl(item.Url);
+        <div id="itemtemplate">
+            @if (thumbnails)
+            {
+                <img src="@item.Img" alt="@item.Img" />
+            }
+            @if (!webpage_types.Contains(item.Ext.ToLower()))
+            {
+                <text>[@((item.Ext + "").TrimStart('.'))] </text>;
+            }
+            <a href="@s"><b>@Html.Raw(SearcharooSearch.hilightTerms(Html.DisplayFor(modelItem => item.Title) + "", terms))</b></a>
+            <a href="@s" target="_blank" title="Abre en ventana nueva" style="font-size:x-small">&uarr;</a>
+            <font color=gray>@Html.DisplayFor(modelItem => item.Rank)</font>
+            <br>@Html.Raw(SearcharooSearch.hilightTerms(Html.DisplayFor(modelItem => item.Description) + "...", terms, "<b><u>{0}</u></b>"))
+            <br><font color=green>
+                @Html.Raw(SearcharooSearch.hilightTerms(Html.DisplayFor(modelItem => item.Url) + "", terms, "<b><u>{0}</u></b>")) - @Html.DisplayFor(modelItem => item.Size)
+                bytes
+            </font>
+            <font color=gray>- @Html.DisplayFor(modelItem => item.CrawledDate)</font><p>
+        </div>
+    }
+    <div id="footertemplate">
+        <p>@Html.Raw(@ViewBag.PagerLinks)</p>
+    </div>
+</div>
+<div id="ucSearchPanelFooter">
+    Partidos: @ViewBag.NumberOfMatches
+</div>

@@ -1,0 +1,48 @@
+﻿@*  8.24.17 ok
+        Depends:
+            jquery 1.7.1+
+        Notes:
+            layout must implement: @RenderSection("styles", required: false)
+
+*@
+@using System
+@using System.Xml.Serialization
+@using System.Collections.Specialized
+@using Searcharoo.Net
+@section Styles {
+    <link href="/Content/mvcsearch.css" rel="stylesheet" />
+}
+<div>
+    @using (Html.BeginForm("Search", "MvcSearch", FormMethod.Post, new { id = "frmSearcharoo" }))
+    {
+        @Html.ValidationSummary(true)
+        <center>
+            <p class="heading">@Html.Raw(@Util.Logo())</p>
+            <table>
+                <tr class="intro">
+                    <td>
+                        <p class="intro">
+                            Search for this word (or words)...<br>
+                            @Html.TextBox("searchfor")
+                            @Html.ValidationMessage("searchfor")
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="all-words">
+                        @Html.YesNoCheckBox("allWords", (Request.Form["all_words"] != null && bool.Parse(Request.Form["all_words"]) ? true : false)) @Searcharoo13Mvc.Resources.Resources.Searcharoo_all_words
+                    </td>
+                </tr>
+                <tr><td align="center"><input type="submit" value="Search" class="button" /></td></tr>
+                <tr><td><p class="copyright">©2017 Better Software Solutions, LLC</p></td></tr>
+            </table>
+        </center>
+    }
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('input#searchfor').focus();
+        });
+    </script>
+}

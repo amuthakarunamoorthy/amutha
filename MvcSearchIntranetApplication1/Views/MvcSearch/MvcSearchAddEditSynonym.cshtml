@@ -1,0 +1,106 @@
+﻿@*  8.24.17 ok
+
+        Depends:
+            jquery 1.7.1+
+            <script src="/Scripts/jquery-ui-1.9.2/jquery-ui.js"></script>
+            <script src="/Scripts/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.js"></script>
+            <script src="/Scripts/jquery-ui-1.9.2/jquery-ui-autocomplete.@(CultureHelper.GetCurrentNeutralCulture()).js"></script>
+            <link href="~/Scripts/jquery-ui-1.9.2.custom/css/base/jquery-ui-1.9.2.custom.css" rel="stylesheet" />
+
+        Notes:
+            layout must implement: @RenderSection("styles", required: false)
+*@
+@model Searcharoo.Net.Synonym
+@using System
+@using System.Xml.Serialization
+@using System.Collections.Specialized
+@using Searcharoo.Net
+@section Styles {
+    <link href="/Content/mvcsearch.css" rel="stylesheet" />
+}
+@{
+    ViewBag.Title = "Add Synonym";
+    string dbaction = (Request.Form["dbaction"] ?? Request.QueryString["dbaction"]);
+}
+<div>
+    <h2>@ViewBag.Msg</h2>
+    <div class="info">Note: after adding synonyms you must Save The Catalog, or you will lose your additions.</div>
+    @using (Html.BeginForm("AddEditSynonym", "MvcSearch", FormMethod.Post, new { id = "frmSearcharoo" }))
+    {
+        @Html.ValidationSummary(true)
+        <center>
+            <p class="heading">@Html.Raw(@Util.Logo())</p>
+            @Html.Hidden("dbaction", dbaction)
+            <table>
+                <tr class="intro">
+                    <td>
+                        <p class="intro">
+                            Synonym<br />
+                            @Html.TextBoxFor(m => m.Text)
+                            <br />@Html.ValidationMessageFor(m => m.Text)
+                        </p>
+                    </td>
+                </tr>
+                <tr class="intro">
+                    <td>
+                        <p class="intro">
+                            For Word (autocomplete)<br />
+                            @Html.TextBoxFor(m => m.SynonymFor)
+                            <br />@Html.ValidationMessageFor(m => m.SynonymFor)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        @switch (dbaction)
+                        {
+                            case "edit":
+                                <input type="submit" value="Update" class="button" />
+                                break;
+                            case "delete":
+                                <input type="submit" value="Delete" class="button" />
+                                @Html.ActionLink(Searcharoo13Mvc.Resources.Resources.Searcharoo_add, "AddEditSynonym")
+                                break;
+                            default:
+                                <input type="submit" value="Add" class="button" />
+                                break;
+                        }
+                    </td>
+                </tr>
+                <tr><td><p class="copyright">©2017 Better Software Solutions, LLC</p></td></tr>
+            </table>
+        </center>
+    }
+    <center>
+        @Html.Partial("../MvcSearch/_Synonyms", (List<Synonym>)ViewBag.Synonyms)
+        @using (Html.BeginForm("SaveCatalog", "MvcSearch", FormMethod.Post, new { id = "frmSearcharooSave" }))
+        {
+            @Html.ValidationSummary(true)
+            <input id="saveToDisk" type="submit" value="Save to Disk" />
+        }
+    </center>
+    <br />
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('input#word').focus();
+            $('input#saveToDisk').click(function (e) {
+                e.preventDefault();
+                if (confirm('This action will completely rewrite the catalog and may take some time. Are you sure you want to continue?'))
+                    $(this).closest('form').submit();
+            });
+            $('input#SynonymFor').autocomplete({
+                source: function (request, response) {
+                    $.getJSON('@Url.Action("AutocompleteWord", "MvcSearch" )', {
+                        text: request.term
+                    }, response);
+                },
+                minLength: 2,
+                select: function (event, ui) {
+                    //window.location.href = ui.item.value;
+                }
+            });
+        });
+    </script>
+}

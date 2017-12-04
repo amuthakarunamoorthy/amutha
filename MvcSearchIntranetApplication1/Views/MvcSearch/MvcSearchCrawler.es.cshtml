@@ -1,0 +1,24 @@
+﻿@*  
+    8.24.17 unt
+*@
+@using System
+@using System.Xml.Serialization
+@using Searcharoo.Net
+@*nw*@
+@section Styles {
+    <link href="/Content/mvcsearch.css" rel="stylesheet" />
+}
+<div>
+    @*@using (Html.BeginForm())*@
+    @*8.10.17 @using (Html.BeginForm("SearcharooCrawler", "MvcSearch", FormMethod.Post, new { id = "frmSearcharoo" }))*@
+    @using (Html.BeginForm("MvcSearchCrawler", "MvcSearch", FormMethod.Post, new { id = "frmSearcharoo" }))
+    {
+        @Html.ValidationSummary(true)
+        
+        <fieldset>
+            <legend>@ViewBag.Legend</legend>
+            @Html.Hidden("dummy", 0)
+            <input type="submit" value="Crear catálogo" />
+        </fieldset>
+    }
+</div>
